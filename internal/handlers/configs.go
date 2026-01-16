@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-telegram/bot"
@@ -16,6 +17,7 @@ import (
 type CfgHandler struct {
 	timerService  *services.TimerService
 	configService *services.ConfigService
+	mu            sync.Mutex
 }
 
 func NewConfigHandler(configService *services.ConfigService, timerService *services.TimerService) *CfgHandler {
@@ -90,6 +92,21 @@ func (h *CfgHandler) GetConfigsHandler(ctx context.Context, b *bot.Bot, update *
 
 func (h *CfgHandler) UpdateConfigs(ctx context.Context, b *bot.Bot, update *models.Update) {
 	h.timerService.AddNewChatToTimer(update.Message.Chat.ID)
+	isBusy := !h.mu.TryLock()
+	if isBusy {
+		_, err := b.SendMessage(ctx, &bot.SendMessageParams{
+			ChatID: update.Message.Chat.ID,
+			Text:   shared.UpdaterBusyMessage,
+		})
+		if err != nil {
+			log.Println(err)
+		}
+		return
+	}
+	go func(mu *sync.Mutex) {
+		defer mu.Unlock()
+		time.Sleep(5 * time.Minute)
+	}(&h.mu)
 	err := h.configService.UpdateConfigs()
 	if err != nil {
 		_, err = b.SendMessage(ctx, &bot.SendMessageParams{

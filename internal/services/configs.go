@@ -22,6 +22,9 @@ func (s *ConfigService) GetConfigs() (string, error) {
 		return "", err
 	}
 	defer responce.Body.Close()
+	if responce.StatusCode != http.StatusOK {
+		return "", err
+	}
 	r := responce.Body
 	scanner := bufio.NewScanner(r)
 	var result string = ""

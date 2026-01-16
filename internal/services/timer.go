@@ -2,6 +2,7 @@ package services
 
 import (
 	"io"
+	"log"
 	"os"
 	"strconv"
 	"strings"
@@ -44,13 +45,15 @@ func (s *TimerService) FillCacheFromFile() error {
 }
 
 func (s *TimerService) AddNewChatToTimer(chatID int64) (success bool) {
-	_, ok := s.Cache.Get(chatID)
-	if ok {
+	v, ok := s.Cache.Get(chatID)
+	if ok && v == 1 {
 		return false
 	}
 	data := strconv.FormatInt(chatID, 10)
+
 	err := appendToFile(s.filename, data)
 	if err != nil {
+		log.Println("append to file: %w", err)
 		return false
 	}
 	s.Cache.Set(chatID, 1)
