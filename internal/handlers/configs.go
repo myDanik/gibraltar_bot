@@ -183,3 +183,14 @@ func (h *CfgHandler) SendConfigByTimer(ctx context.Context, b *bot.Bot) {
 	}
 
 }
+
+func (h *CfgHandler) GetSubscription(ctx context.Context, b *bot.Bot, update *models.Update) {
+	_, err := b.SendMessage(ctx, &bot.SendMessageParams{
+		ChatID:    update.Message.Chat.ID,
+		Text:      shared.SubscriptionMessage,
+		ParseMode: models.ParseModeMarkdown,
+	})
+	if err != nil {
+		log.Println(err)
+	}
+}

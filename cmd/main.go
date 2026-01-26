@@ -33,6 +33,7 @@ func main() {
 	cfgH := handlers.NewConfigHandler(cfgS, timerService)
 
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/configs", bot.MatchTypeExact, cfgH.GetConfigsHandler)
+	b.RegisterHandler(bot.HandlerTypeMessageText, "/subscription", bot.MatchTypeExact, cfgH.GetSubscription)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/update", bot.MatchTypeExact, cfgH.UpdateConfigs)
 	b.RegisterHandler(bot.HandlerTypeMessageText, "/help", bot.MatchTypeExact, cfgH.GetHelp)
 
