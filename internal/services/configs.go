@@ -3,6 +3,7 @@ package services
 import (
 	"bufio"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -29,6 +30,10 @@ func (s *ConfigService) GetConfigs() (string, error) {
 	scanner := bufio.NewScanner(r)
 	var result string = ""
 	for scanner.Scan() {
+		line := scanner.Text()
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
 		result += scanner.Text() + "\n"
 
 	}
